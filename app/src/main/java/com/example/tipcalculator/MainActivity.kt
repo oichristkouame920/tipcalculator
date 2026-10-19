@@ -30,6 +30,8 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +51,9 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun TipTimeLayout() {
+    var amountInput by remember { mutableStateOf("") }
+    val amount = amountInput.toDoubleOrNull() ?: 0.0
+    val tip = calculateTip(amount)
     Column(
         modifier = Modifier
             .statusBarsPadding()
@@ -63,7 +68,14 @@ fun TipTimeLayout() {
                 .padding(bottom = 16.dp, top = 40.dp)
                 .align(alignment = Alignment.Start)
         )
-        EditNumberField(modifier = Modifier.padding(bottom = 32.dp).fillMaxWidth())
+        EditNumberField(
+            value = amountInput,
+            onValueChange = { amountInput = it },
+            modifier = Modifier
+                .padding(bottom= 32.dp)
+                .fillMaxWidth()
+        )
+
         Text(
             text = stringResource(R.string.tip_amount, "$0.00"),
             style = MaterialTheme.typography.displaySmall
@@ -72,12 +84,17 @@ fun TipTimeLayout() {
     }
 }
 @Composable
-fun EditNumberField(modifier: Modifier = Modifier) {
-    val amountInput = mutableStateOf("0")
+fun EditNumberField(value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier) {
+    var amountInput by remember { mutableStateOf("")}
+    val amount = amountInput.toDoubleOrNull() ?: 0.0
+    val tip = calculateTip(amount)
     TextField(
-        value = amountInput.value,
-        onValueChange = { amountInput.value = it },
-        modifier = modifier
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(stringResource(R.string.bill_amount)) },
+        modifier = Modifier.fillMaxWidth(),
+        singleLine= true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
     )
 }
 /**
